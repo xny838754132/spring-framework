@@ -84,7 +84,7 @@ public class PluggableSchemaResolver implements EntityResolver {
 	 */
 	public PluggableSchemaResolver(@Nullable ClassLoader classLoader) {
 		this.classLoader = classLoader;
-		// 指定配置文件路径
+		// 指定本地配置文件路径
 		this.schemaMappingsLocation = DEFAULT_SCHEMA_MAPPINGS_LOCATION;
 	}
 
