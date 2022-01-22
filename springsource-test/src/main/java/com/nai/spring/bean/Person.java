@@ -1,21 +1,37 @@
 package com.nai.spring.bean;
 
+import org.springframework.beans.factory.annotation.Lookup;
+import org.springframework.stereotype.Component;
+
+@Component
 public class Person {
 
-	private String name;
+    private String name;
 
-	public String getName() {
-		return name;
-	}
+    // @Autowired
+    private Cat cat;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setCat(Cat cat) {
+        this.cat = cat;
+    }
 
-	@Override
-	public String toString() {
-		return "Person{" +
-				"name='" + name + '\'' +
-				'}';
-	}
+    @Lookup // 去容器中找 @Bean的方式注册的Person @Lookup不生效
+    public Cat getCat() {
+        return cat;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }
