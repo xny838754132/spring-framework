@@ -51,6 +51,7 @@ dependencies {
 	testImplementation(testFixtures(project(":spring-core")))
 	testImplementation(testFixtures(project(":spring-tx")))
 	testImplementation(testFixtures(project(":spring-web")))
+	implementation 'org.projectlombok:lombok:1.18.26'
 	testImplementation("jakarta.annotation:jakarta.annotation-api")
 	testImplementation("javax.cache:cache-api")
 	testImplementation("jakarta.ejb:jakarta.ejb-api")
