@@ -1,12 +1,12 @@
 package org.springframework.mytest.bean;
 
-import lombok.Data;
+import org.springframework.stereotype.Component;
 
 /**
  * @author TheNai
  * @date 2023-02-07
  */
-@Data
+@Component
 public class Cat {
 
 	private String name;

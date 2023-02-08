@@ -8,6 +8,7 @@ public class ClassPathXmlTest {
 	public static void main(String[] args) {
 		ApplicationContext context = new ClassPathXmlApplicationContext("bean.xml");
 		Person bean = context.getBean(Person.class);
-		System.out.println(bean.getName());
+		ApplicationContext context1 = bean.getContext();
+		System.out.println(context1);
 	}
 }
