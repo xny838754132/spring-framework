@@ -6,4 +6,10 @@
 		<property name="name" value="张三"/>
 	</bean>
 
+	<bean class="org.springframework.mytest.bean.Cat">
+		<property name="name" value="猫咪"/>
+	</bean>
+
+	<bean class="org.springframework.mytest.bean.HelloFactory" id="hello"/>
+
 </beans>
