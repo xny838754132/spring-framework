@@ -7,7 +7,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
-import org.springframework.stereotype.Component;
 
 /**
  * Aware 接口：帮我们装配 Spring 底层的一些组件
@@ -17,7 +16,7 @@ import org.springframework.stereotype.Component;
  * Person 为什么能把 ApplicationContext 和 MessageSource 当做自己的参数传入进来
  *   - 通过实现接口的方式自动注入了 ApplicationContext 和 MessageSource。 是由 BeanPostProcessor 来完成的
  */
-@Component
+//@Component
 public class Person implements ApplicationContextAware, MessageSourceAware {
 
 	//	@Autowired

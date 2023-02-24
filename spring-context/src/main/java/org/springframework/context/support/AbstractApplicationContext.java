@@ -520,7 +520,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			// Prepare this context for refreshing.
 			prepareRefresh();
 
-			// Tell the subclass to refresh the internal bean factory. BeanFactory 第一次开始创建的时候 ， XML 解析逻辑
+			// 工厂创建： BeanFactory 第一次开始创建的时候 ， XML 解析逻辑 Tell the subclass to refresh the internal bean factory.
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
@@ -531,10 +531,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				postProcessBeanFactory(beanFactory);
 
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
-				// Invoke factory processors registered as beans in the context.
+				// 工厂增强 ： 执行所有的 BeanFactory 后置增强器 ； 利用 BeanFactory 的后置增强器 对工厂进行修改或增强 Invoke factory processors registered as beans in the context.
 				invokeBeanFactoryPostProcessors(beanFactory);
 
-				// Register bean processors that intercept bean creation.
+				// 注册所有的 Bean 后置处理器 Register bean processors that intercept bean creation.
 				registerBeanPostProcessors(beanFactory);
 				beanPostProcess.end();
 
@@ -547,11 +547,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Initialize other special beans in specific context subclasses.
 				onRefresh();
 
-				// Check for listener beans and register them.
+				// 检查并注册监听器 ；Spring 事件监听机制从这里初始化 Check for listener beans and register them.
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
-				// 完成 BeanFactory 初始化 (工厂中所有的组件都好了)
+				// Bean创建： 完成 BeanFactory 初始化 (工厂中所有的组件都好了)
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
@@ -838,10 +838,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Do not initialize FactoryBeans here: We need to leave all regular beans
-		// uninitialized to let post-processors apply to them!
+		// uninitialized to let post-processors apply to them! 获取 ApplicationListener 在 IOC 容器中注册的 Bean 的名字
 		String[] listenerBeanNames = getBeanNamesForType(ApplicationListener.class, true, false);
 		for (String listenerBeanName : listenerBeanNames) {
-			getApplicationEventMulticaster().addApplicationListenerBean(listenerBeanName);
+			getApplicationEventMulticaster().addApplicationListenerBean(listenerBeanName); // 获取所有的容器中的监听器，并保存他们的名字
 		}
 
 		// Publish early application events now that we finally have a multicaster...
@@ -1239,7 +1239,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		return getBeanFactory().getBeanNamesForType(type);
 	}
 
-	@Override
+	@Override // 获取某个类型的组件在容器中的所有名字
 	public String[] getBeanNamesForType(@Nullable Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
 		assertBeanFactoryActive();
 		return getBeanFactory().getBeanNamesForType(type, includeNonSingletons, allowEagerInit);

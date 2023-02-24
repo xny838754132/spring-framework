@@ -6,7 +6,7 @@ import org.springframework.mytest.bean.Person;
 
 public class ClassPathXmlTest {
 	public static void main(String[] args) {
-		ApplicationContext context = new ClassPathXmlApplicationContext("bean.xml");
+		ApplicationContext context = new ClassPathXmlApplicationContext("bean2.xml");
 		Person bean = context.getBean(Person.class);
 		ApplicationContext context1 = bean.getContext();
 		System.out.println(context1);

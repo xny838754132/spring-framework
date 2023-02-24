@@ -10,7 +10,7 @@ import org.springframework.mytest.bean.Person;
  */
 public class AnnotationTest {
 	public static void main(String[] args) {
-		ApplicationContext context = new AnnotationConfigApplicationContext("org.springframework.mytest.bean");
+		ApplicationContext context = new AnnotationConfigApplicationContext("org.springframework.mytest.processor.*.**");
 		Person bean = context.getBean(Person.class);
 		ApplicationContext beanContext = bean.getContext();
 		System.out.println(context == beanContext);
