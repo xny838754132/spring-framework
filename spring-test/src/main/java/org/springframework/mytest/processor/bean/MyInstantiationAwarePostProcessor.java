@@ -16,33 +16,34 @@ public class MyInstantiationAwarePostProcessor implements InstantiationAwareBean
 		System.out.println("MyInstantiationAwarePostProcessor");
 	}
 
-	@Override
+	@Override // 初始化之前改变对象类型
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-		System.out.println("postProcessBeforeInitialization ... ");
-		return InstantiationAwareBeanPostProcessor.super.postProcessBeforeInitialization(bean, beanName);
+		System.out.println("InstantiationAwareBeanPostProcessor.postProcessBeforeInitialization ... ");
+		return null;
 	}
 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-		System.out.println("postProcessAfterInitialization ... ");
-		return InstantiationAwareBeanPostProcessor.super.postProcessAfterInitialization(bean, beanName);
+		System.out.println("InstantiationAwareBeanPostProcessor.postProcessAfterInitialization ... ");
+		return null;
 	}
 
 	@Override
 	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
-		System.out.println("postProcessBeforeInstantiation ... ");
-		return InstantiationAwareBeanPostProcessor.super.postProcessBeforeInstantiation(beanClass, beanName);
+		System.out.println("InstantiationAwareBeanPostProcessor.postProcessBeforeInstantiation ... ");
+		return null;
 	}
 
 	@Override
 	public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
-		System.out.println("postProcessAfterInstantiation ... ");
-		return InstantiationAwareBeanPostProcessor.super.postProcessAfterInstantiation(bean, beanName);
+		System.out.println("InstantiationAwareBeanPostProcessor.postProcessAfterInstantiation ...==> " + bean + "--" + beanName);
+
+		return true; // 返回 false ，则 Bean的赋值全部结束
 	}
 
-	@Override
+	@Override // 解析自定义注解 进行属性注入 ；pvs 封装了所有的属性信息
 	public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) throws BeansException {
-		System.out.println("postProcessProperties ... ");
-		return InstantiationAwareBeanPostProcessor.super.postProcessProperties(pvs, bean, beanName);
+		System.out.println("InstantiationAwareBeanPostProcessor.postProcessProperties ... ");
+		return null;
 	}
 }

@@ -13,6 +13,7 @@ public class Cat implements InitializingBean {
 
 	private String name;
 
+	// 注解怎么定义这个是初始化方法？
 	public String getName() {
 		return name;
 	}

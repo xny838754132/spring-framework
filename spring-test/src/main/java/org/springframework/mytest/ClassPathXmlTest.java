@@ -2,13 +2,12 @@ package org.springframework.mytest;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.mytest.bean.Person;
+import org.springframework.mytest.bean.Cat;
 
 public class ClassPathXmlTest {
 	public static void main(String[] args) {
 		ApplicationContext context = new ClassPathXmlApplicationContext("bean2.xml");
-		Person bean = context.getBean(Person.class);
-		ApplicationContext context1 = bean.getContext();
-		System.out.println(context1);
+		Cat bean = context.getBean(Cat.class);
+		System.out.println(bean);
 	}
 }

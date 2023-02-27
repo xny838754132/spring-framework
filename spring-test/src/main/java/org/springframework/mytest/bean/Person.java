@@ -2,7 +2,6 @@ package org.springframework.mytest.bean;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.MessageSource;
@@ -26,7 +25,7 @@ public class Person implements ApplicationContextAware, MessageSourceAware {
 
 	private Cat cat;
 
-	@Autowired
+//	@Autowired
 	public void setCat(Cat cat) {
 		this.cat = cat;
 	}

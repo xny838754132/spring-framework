@@ -873,10 +873,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			beanFactory.addEmbeddedValueResolver(strVal -> getEnvironment().resolvePlaceholders(strVal));
 		}
 
-		// LoadTimeWeaverAware；Aspectj： 加载时植入功能  Initialize LoadTimeWeaverAware beans early to allow for registering their transformers early.
+		// LoadTimeWeaverAware；Aspectj： 加载时植入功能 【AOP】 Initialize LoadTimeWeaverAware beans early to allow for registering their transformers early.
 		String[] weaverAwareNames = beanFactory.getBeanNamesForType(LoadTimeWeaverAware.class, false, false);
 		for (String weaverAwareName : weaverAwareNames) {
-			getBean(weaverAwareName);
+			getBean(weaverAwareName); // 从容器中获取组件，有则直接获取，无则进行创建
 		}
 
 		// Stop using the temporary ClassLoader for type matching.

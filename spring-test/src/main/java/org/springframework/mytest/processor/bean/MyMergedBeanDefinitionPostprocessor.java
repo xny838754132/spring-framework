@@ -28,7 +28,7 @@ public class MyMergedBeanDefinitionPostprocessor implements MergedBeanDefinition
 		return MergedBeanDefinitionPostProcessor.super.postProcessAfterInitialization(bean, beanName);
 	}
 
-	@Override
+	@Override // 对象创建完后，可以再修改 BeanDefinition
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
 		System.out.println("postProcessMergedBeanDefinition ...");
 	}
