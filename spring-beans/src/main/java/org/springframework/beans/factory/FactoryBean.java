@@ -140,7 +140,7 @@ public interface FactoryBean<T> {
 	 * {@code FactoryBean} typically manages a singleton instance.
 	 * @return whether the exposed object is a singleton
 	 * @see #getObject()
-	 * @see SmartFactoryBean#isPrototype()
+	 * @see SmartFactoryBean#isPrototype() // 可以修改为不是单例的
 	 */
 	default boolean isSingleton() {
 		return true;

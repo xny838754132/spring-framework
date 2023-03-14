@@ -2,7 +2,8 @@ package org.springframework.mytest;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.mytest.bean.Person;
+import org.springframework.mytest.bean.Hello;
+import org.springframework.mytest.config.MainConfig;
 
 /**
  * @author TheNai
@@ -10,9 +11,9 @@ import org.springframework.mytest.bean.Person;
  */
 public class AnnotationTest {
 	public static void main(String[] args) {
-		ApplicationContext context = new AnnotationConfigApplicationContext("org.springframework.mytest.processor.*.**");
-		Person bean = context.getBean(Person.class);
-		ApplicationContext beanContext = bean.getContext();
-		System.out.println(context == beanContext);
+		ApplicationContext context = new AnnotationConfigApplicationContext(MainConfig.class);
+		Hello bean = context.getBean(Hello.class);
+		Hello bean2 = context.getBean(Hello.class);
+		System.out.println(bean == bean2);
 	}
 }

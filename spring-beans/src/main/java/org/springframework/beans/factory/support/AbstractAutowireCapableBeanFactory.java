@@ -75,7 +75,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		implements AutowireCapableBeanFactory {
 
 	/**
-	 * 指定 Bean 的创建策略 ： 可以用 JDK 反射，可以用CGLIB 反射 Strategy for creating bean instances.
+	 * 指定 Bean 的创建策略 ： 可以用 JDK 反射，可以用CGLIB 反射 Strategy for creating bean instances.factoryBeanCache
 	 */
 	private InstantiationStrategy instantiationStrategy;
 

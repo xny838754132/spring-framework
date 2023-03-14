@@ -202,7 +202,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		Object beanInstance;
 
 		// Eagerly check singleton cache for manually registered singletons.
-		Object sharedInstance = getSingleton(beanName); // 检查缓存中有没有
+		Object sharedInstance = getSingleton(beanName); // 检查缓存中有没有 ， 如果是第一次获取组件肯定是没有的
 		if (sharedInstance != null && args == null) {
 			if (logger.isTraceEnabled()) {
 				if (isSingletonCurrentlyInCreation(beanName)) {
@@ -216,7 +216,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			beanInstance = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		}
 
-		else {
+		else { // 默认第一次获取组件都会进入 else 环节
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
 			if (isPrototypeCurrentlyInCreation(beanName)) {
@@ -522,9 +522,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			return false;
 		}
 
-		// No singleton instance found -> check bean definition.
+		// 拿到整个 BeanFactory 的 父工厂，如果父工厂没有则继续，如果有则从父工厂尝试获取组件 No singleton instance found -> check bean definition.
 		BeanFactory parentBeanFactory = getParentBeanFactory();
-		if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
+		if (parentBeanFactory != null && !containsBeanDefinition(beanName)) { // 以下开始从父工厂获取组件
 			// No bean definition found in this factory -> delegate to parent.
 			return parentBeanFactory.isTypeMatch(originalBeanName(name), typeToMatch);
 		}
