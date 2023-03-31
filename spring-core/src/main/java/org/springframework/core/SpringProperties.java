@@ -16,12 +16,12 @@
 
 package org.springframework.core;
 
+import org.springframework.lang.Nullable;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
-
-import org.springframework.lang.Nullable;
 
 /**
  * Static holder for local Spring properties, i.e. defined at the Spring library level.
@@ -63,7 +63,7 @@ public final class SpringProperties {
 					ClassLoader.getSystemResource(PROPERTIES_RESOURCE_LOCATION));
 			if (url != null) {
 				try (InputStream is = url.openStream()) {
-					localProperties.load(is);
+					localProperties.load(is); // 读取 Spring 的默认配置 spring.properties
 				}
 			}
 		}
