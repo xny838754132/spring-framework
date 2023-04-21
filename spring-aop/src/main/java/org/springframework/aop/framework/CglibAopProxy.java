@@ -16,46 +16,26 @@
 
 package org.springframework.aop.framework;
 
-import java.io.Serializable;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.UndeclaredThrowableException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
-
 import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.springframework.aop.Advisor;
-import org.springframework.aop.AopInvocationException;
-import org.springframework.aop.PointcutAdvisor;
-import org.springframework.aop.RawTargetAccess;
-import org.springframework.aop.TargetSource;
+import org.springframework.aop.*;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.cglib.core.ClassLoaderAwareGeneratorStrategy;
 import org.springframework.cglib.core.CodeGenerationException;
 import org.springframework.cglib.core.SpringNamingPolicy;
-import org.springframework.cglib.proxy.Callback;
-import org.springframework.cglib.proxy.CallbackFilter;
-import org.springframework.cglib.proxy.Dispatcher;
-import org.springframework.cglib.proxy.Enhancer;
-import org.springframework.cglib.proxy.Factory;
-import org.springframework.cglib.proxy.MethodInterceptor;
-import org.springframework.cglib.proxy.MethodProxy;
-import org.springframework.cglib.proxy.NoOp;
+import org.springframework.cglib.proxy.*;
 import org.springframework.core.KotlinDetector;
 import org.springframework.core.SmartClassLoader;
 import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.ReflectionUtils;
+import org.springframework.util.*;
+
+import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.*;
 
 /**
  * CGLIB-based {@link AopProxy} implementation for the Spring AOP framework.
@@ -666,8 +646,8 @@ class CglibAopProxy implements AopProxy, Serializable {
 			boolean setProxyContext = false;
 			Object target = null;
 			TargetSource targetSource = this.advised.getTargetSource();
-			try {
-				if (this.advised.exposeProxy) {
+			try { // exposeProxy：暴露代理对象，使用了代理对象就有增强功能
+				if (this.advised.exposeProxy) { // 使用 ThreadLocal 线程共享代理对象
 					// Make invocation available if necessary.
 					oldProxy = AopContext.setCurrentProxy(proxy);
 					setProxyContext = true;
@@ -676,7 +656,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 				target = targetSource.getTarget();
 				Class<?> targetClass = (target != null ? target.getClass() : null);
 				List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
-				Object retVal;
+				Object retVal; // chain 是 AOP 的后置处理器在第一次时候生成好的5个增强，然后封装成的 MethodInterceptor
 				// Check whether we only have one InvokerInterceptor: that is,
 				// no real advice, but just reflective invocation of the target.
 				if (chain.isEmpty() && CglibMethodInvocation.isMethodProxyCompatible(method)) {
@@ -693,8 +673,8 @@ class CglibAopProxy implements AopProxy, Serializable {
 						retVal = AopUtils.invokeJoinpointUsingReflection(target, method, argsToUse);
 					}
 				}
-				else {
-					// We need to create a method invocation...
+				else { // CglibMethodInvocation [FilterChain(维护索引)] 5 个 MethodInterceptor 相当于 5 层 Filter
+					// 创建一个方法执行的东西（拦截器链再此执行） We need to create a method invocation...
 					retVal = new CglibMethodInvocation(proxy, target, method, args, targetClass, chain, methodProxy).proceed();
 				}
 				retVal = processReturnType(proxy, target, method, retVal);
@@ -886,7 +866,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 				return INVOKE_HASHCODE;
 			}
 			Class<?> targetClass = this.advised.getTargetClass();
-			// Proxy is not yet available, but that shouldn't matter.
+			// Proxy is not yet available, but that shouldn't matter. 责任链模式在执行目标方法前后执行其他方法
 			List<?> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
 			boolean haveAdvice = !chain.isEmpty();
 			boolean exposeProxy = this.advised.isExposeProxy();

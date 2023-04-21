@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.aopalliance.intercept;
+package org.aopalliance.intercept; // Spring 定义的AOP规范接口
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

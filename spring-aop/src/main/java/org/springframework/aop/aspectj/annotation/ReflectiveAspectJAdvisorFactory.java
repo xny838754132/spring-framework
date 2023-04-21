@@ -16,33 +16,11 @@
 
 package org.springframework.aop.aspectj.annotation;
 
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
 import org.aopalliance.aop.Advice;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.AfterThrowing;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.DeclareParents;
-import org.aspectj.lang.annotation.Pointcut;
-
+import org.aspectj.lang.annotation.*;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.MethodBeforeAdvice;
-import org.springframework.aop.aspectj.AbstractAspectJAdvice;
-import org.springframework.aop.aspectj.AspectJAfterAdvice;
-import org.springframework.aop.aspectj.AspectJAfterReturningAdvice;
-import org.springframework.aop.aspectj.AspectJAfterThrowingAdvice;
-import org.springframework.aop.aspectj.AspectJAroundAdvice;
-import org.springframework.aop.aspectj.AspectJExpressionPointcut;
-import org.springframework.aop.aspectj.AspectJMethodBeforeAdvice;
-import org.springframework.aop.aspectj.DeclareParentsAdvisor;
+import org.springframework.aop.aspectj.*;
 import org.springframework.aop.framework.AopConfigException;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.beans.factory.BeanFactory;
@@ -54,6 +32,14 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.MethodFilter;
 import org.springframework.util.StringUtils;
 import org.springframework.util.comparator.InstanceComparator;
+
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Factory that can create Spring AOP Advisors given AspectJ classes from
@@ -73,7 +59,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 
 	// Exclude @Pointcut methods
 	private static final MethodFilter adviceMethodFilter = ReflectionUtils.USER_DECLARED_METHODS
-			.and(method -> (AnnotationUtils.getAnnotation(method, Pointcut.class) == null));
+			.and(method -> (AnnotationUtils.getAnnotation(method, Pointcut.class) == null)); // 切入点表达式
 
 	private static final Comparator<Method> adviceMethodComparator;
 
@@ -110,10 +96,11 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 	 * Create a new {@code ReflectiveAspectJAdvisorFactory}, propagating the given
 	 * {@link BeanFactory} to the created {@link AspectJExpressionPointcut} instances,
 	 * for bean pointcut handling as well as consistent {@link ClassLoader} resolution.
+	 *
 	 * @param beanFactory the BeanFactory to propagate (may be {@code null}}
-	 * @since 4.3.6
 	 * @see AspectJExpressionPointcut#setBeanFactory
 	 * @see org.springframework.beans.factory.config.ConfigurableBeanFactory#getBeanClassLoader()
+	 * @since 4.3.6
 	 */
 	public ReflectiveAspectJAdvisorFactory(@Nullable BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
@@ -131,7 +118,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 		MetadataAwareAspectInstanceFactory lazySingletonAspectInstanceFactory =
 				new LazySingletonAspectInstanceFactoryDecorator(aspectInstanceFactory);
 
-		List<Advisor> advisors = new ArrayList<>();
+		List<Advisor> advisors = new ArrayList<>(); // 先准备所有的增强器集合，收集所有增强器
 		for (Method method : getAdvisorMethods(aspectClass)) {
 			// Prior to Spring Framework 5.2.7, advisors.size() was supplied as the declarationOrderInAspect
 			// to getAdvisor(...) to represent the "current position" in the declared methods list.
@@ -140,7 +127,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 			// Thus, we now hard code the declarationOrderInAspect to 0 for all advice methods
 			// discovered via reflection in order to support reliable advice ordering across JVM launches.
 			// Specifically, a value of 0 aligns with the default value used in
-			// AspectJPrecedenceComparator.getAspectDeclarationOrder(Advisor).
+			// AspectJPrecedenceComparator.getAspectDeclarationOrder(Advisor). // 分析如果让钱发放是通知方法则封装成 Advisor 增强器
 			Advisor advisor = getAdvisor(method, lazySingletonAspectInstanceFactory, 0, aspectName);
 			if (advisor != null) {
 				advisors.add(advisor);
@@ -153,7 +140,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 			advisors.add(0, instantiationAdvisor);
 		}
 
-		// Find introduction fields.
+		// 需要增强属性：@DeclareParents Find introduction fields.
 		for (Field field : aspectClass.getDeclaredFields()) {
 			Advisor advisor = getDeclareParentsAdvisor(field);
 			if (advisor != null) {
@@ -177,6 +164,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 	 * Build a {@link org.springframework.aop.aspectj.DeclareParentsAdvisor}
 	 * for the given introduction field.
 	 * <p>Resulting Advisors will need to be evaluated for targets.
+	 *
 	 * @param introductionField the field to introspect
 	 * @return the Advisor instance, or {@code null} if not an Advisor
 	 */
@@ -200,10 +188,10 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 	@Override
 	@Nullable
 	public Advisor getAdvisor(Method candidateAdviceMethod, MetadataAwareAspectInstanceFactory aspectInstanceFactory,
-			int declarationOrderInAspect, String aspectName) {
+							  int declarationOrderInAspect, String aspectName) {
 
 		validate(aspectInstanceFactory.getAspectMetadata().getAspectClass());
-
+		// 获取切入点表达式
 		AspectJExpressionPointcut expressionPointcut = getPointcut(
 				candidateAdviceMethod, aspectInstanceFactory.getAspectMetadata().getAspectClass());
 		if (expressionPointcut == null) {
@@ -235,7 +223,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 	@Override
 	@Nullable
 	public Advice getAdvice(Method candidateAdviceMethod, AspectJExpressionPointcut expressionPointcut,
-			MetadataAwareAspectInstanceFactory aspectInstanceFactory, int declarationOrder, String aspectName) {
+							MetadataAwareAspectInstanceFactory aspectInstanceFactory, int declarationOrder, String aspectName) {
 
 		Class<?> candidateAspectClass = aspectInstanceFactory.getAspectMetadata().getAspectClass();
 		validate(candidateAspectClass);

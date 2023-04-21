@@ -16,19 +16,18 @@
 
 package org.springframework.aop.aspectj.annotation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.aspectj.lang.reflect.PerClauseKind;
-
 import org.springframework.aop.Advisor;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Helper for retrieving @AspectJ beans from a BeanFactory and building
@@ -82,7 +81,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 	 */
 	public List<Advisor> buildAspectJAdvisors() {
 		List<String> aspectNames = this.aspectBeanNames;
-
+		// 双检查锁
 		if (aspectNames == null) {
 			synchronized (this) {
 				aspectNames = this.aspectBeanNames;
@@ -102,14 +101,14 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 							continue;
 						}
 						if (this.advisorFactory.isAspect(beanType)) {
-							aspectNames.add(beanName);
+							aspectNames.add(beanName); // 每一个组件都先判断是否是切面，如果是 放入到集合中
 							AspectMetadata amd = new AspectMetadata(beanType, beanName);
 							if (amd.getAjType().getPerClause().getKind() == PerClauseKind.SINGLETON) {
 								MetadataAwareAspectInstanceFactory factory =
 										new BeanFactoryAspectInstanceFactory(this.beanFactory, beanName);
-								List<Advisor> classAdvisors = this.advisorFactory.getAdvisors(factory);
+								List<Advisor> classAdvisors = this.advisorFactory.getAdvisors(factory); // 利用 advisorFactory 获取增强器
 								if (this.beanFactory.isSingleton(beanName)) {
-									this.advisorsCache.put(beanName, classAdvisors);
+									this.advisorsCache.put(beanName, classAdvisors); // 放入 增强器缓存中
 								}
 								else {
 									this.aspectFactoryCache.put(beanName, factory);
@@ -139,7 +138,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 			return Collections.emptyList();
 		}
 		List<Advisor> advisors = new ArrayList<>();
-		for (String aspectName : aspectNames) {
+		for (String aspectName : aspectNames) { // 遍历所有的切面 找到增强器
 			List<Advisor> cachedAdvisors = this.advisorsCache.get(aspectName);
 			if (cachedAdvisors != null) {
 				advisors.addAll(cachedAdvisors);

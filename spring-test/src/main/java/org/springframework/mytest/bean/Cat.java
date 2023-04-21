@@ -2,13 +2,12 @@ package org.springframework.mytest.bean;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 /**
  * @author TheNai
  * @date 2023-02-07
  */
-@Component
+//@Component
 public class Cat implements InitializingBean {
 
 	private String name;

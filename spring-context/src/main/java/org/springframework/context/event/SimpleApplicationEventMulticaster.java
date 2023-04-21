@@ -16,11 +16,8 @@
 
 package org.springframework.context.event;
 
-import java.util.concurrent.Executor;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
@@ -28,6 +25,8 @@ import org.springframework.context.PayloadApplicationEvent;
 import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ErrorHandler;
+
+import java.util.concurrent.Executor;
 
 /**
  * Simple implementation of the {@link ApplicationEventMulticaster} interface.
@@ -130,13 +129,13 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	public void multicastEvent(ApplicationEvent event) {
 		multicastEvent(event, resolveDefaultEventType(event));
 	}
-
+	// 事件派发可以是异步的
 	@Override
 	public void multicastEvent(final ApplicationEvent event, @Nullable ResolvableType eventType) {
 		ResolvableType type = (eventType != null ? eventType : resolveDefaultEventType(event));
 		Executor executor = getTaskExecutor();
 		for (ApplicationListener<?> listener : getApplicationListeners(event, type)) {
-			if (executor != null) {
+			if (executor != null) { // 使用观察者模式，把所有事件监听器拿到，调用他们的 onApplicationEvent(event)
 				executor.execute(() -> invokeListener(listener, event));
 			}
 			else {

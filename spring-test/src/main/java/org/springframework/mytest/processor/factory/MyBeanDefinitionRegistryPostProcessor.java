@@ -20,12 +20,12 @@ public class MyBeanDefinitionRegistryPostProcessor implements BeanDefinitionRegi
 
 	@Override // 随后执行
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-		System.out.println("postProcessBeanFactory");
+//		System.out.println("postProcessBeanFactory");
 	}
 
 	@Override // 先执行
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-		System.out.println("postProcessBeanDefinitionRegistry");
+//		System.out.println("postProcessBeanDefinitionRegistry");
 		// 增强 Bean  定义信息的注册中心 ， 比如自己注册组件
 	}
 }

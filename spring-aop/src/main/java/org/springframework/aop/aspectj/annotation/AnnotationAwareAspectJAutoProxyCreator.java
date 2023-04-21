@@ -16,16 +16,16 @@
 
 package org.springframework.aop.aspectj.annotation;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import org.springframework.aop.Advisor;
 import org.springframework.aop.aspectj.autoproxy.AspectJAwareAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * {@link AspectJAwareAdvisorAutoProxyCreator} subclass that processes all AspectJ
@@ -75,29 +75,29 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 		this.aspectJAdvisorFactory = aspectJAdvisorFactory;
 	}
 
-	@Override
+	@Override // 初始化 Bean 工厂 BeanFactoryAware 来的。 当前后置处理器初始化创建对象时的回调
 	protected void initBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		super.initBeanFactory(beanFactory);
 		if (this.aspectJAdvisorFactory == null) {
-			this.aspectJAdvisorFactory = new ReflectiveAspectJAdvisorFactory(beanFactory);
+			this.aspectJAdvisorFactory = new ReflectiveAspectJAdvisorFactory(beanFactory); // 准备一个 ReflectiveAspectJAdvisorFactory
 		}
 		this.aspectJAdvisorsBuilder =
 				new BeanFactoryAspectJAdvisorsBuilderAdapter(beanFactory, this.aspectJAdvisorFactory);
 	}
 
 
-	@Override
+	@Override // 找到候选的增强器
 	protected List<Advisor> findCandidateAdvisors() {
-		// Add all the Spring advisors found according to superclass rules.
+		// Add all the Spring advisors found according to superclass rules. 判断这个 Bean 是否需要增强 ， 只需要找到他的所有增强器
 		List<Advisor> advisors = super.findCandidateAdvisors();
 		// Build Advisors for all AspectJ aspects in the bean factory.
-		if (this.aspectJAdvisorsBuilder != null) {
+		if (this.aspectJAdvisorsBuilder != null) { // 判断增强器的构建器是否存在
 			advisors.addAll(this.aspectJAdvisorsBuilder.buildAspectJAdvisors());
 		}
 		return advisors;
 	}
 
-	@Override
+	@Override // 是否为基础结构类
 	protected boolean isInfrastructureClass(Class<?> beanClass) {
 		// Previously we setProxyTargetClass(true) in the constructor, but that has too
 		// broad an impact. Instead we now override isInfrastructureClass to avoid proxying
@@ -106,7 +106,7 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 		// proxy, and if the aspect implements e.g the Ordered interface it will be
 		// proxied by that interface and fail at runtime as the advice method is not
 		// defined on the interface. We could potentially relax the restriction about
-		// not advising aspects in the future.
+		// not advising aspects in the future. 判断是否为切面
 		return (super.isInfrastructureClass(beanClass) ||
 				(this.aspectJAdvisorFactory != null && this.aspectJAdvisorFactory.isAspect(beanClass)));
 	}

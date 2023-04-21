@@ -16,8 +16,6 @@
 
 package org.springframework.aop.framework.autoproxy;
 
-import java.util.List;
-
 import org.springframework.aop.Advisor;
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.support.AopUtils;
@@ -26,6 +24,8 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import java.util.List;
 
 /**
  * Generic auto proxy creator that builds AOP proxies for specific beans
@@ -62,7 +62,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 			throw new IllegalArgumentException(
 					"AdvisorAutoProxyCreator requires a ConfigurableListableBeanFactory: " + beanFactory);
 		}
-		initBeanFactory((ConfigurableListableBeanFactory) beanFactory);
+		initBeanFactory((ConfigurableListableBeanFactory) beanFactory); // 子类会继续重写
 	}
 
 	protected void initBeanFactory(ConfigurableListableBeanFactory beanFactory) {
@@ -74,7 +74,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	@Nullable
 	protected Object[] getAdvicesAndAdvisorsForBean(
 			Class<?> beanClass, String beanName, @Nullable TargetSource targetSource) {
-
+		// 找到所有适合这个类的增强器
 		List<Advisor> advisors = findEligibleAdvisors(beanClass, beanName);
 		if (advisors.isEmpty()) {
 			return DO_NOT_PROXY;
@@ -93,8 +93,8 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 * @see #extendAdvisors
 	 */
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
-		List<Advisor> candidateAdvisors = findCandidateAdvisors();
-		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
+		List<Advisor> candidateAdvisors = findCandidateAdvisors(); // 缓存中直接获取
+		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName); // 看增强器能不能应用到这个对象上
 		extendAdvisors(eligibleAdvisors);
 		if (!eligibleAdvisors.isEmpty()) {
 			eligibleAdvisors = sortAdvisors(eligibleAdvisors);

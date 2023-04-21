@@ -407,7 +407,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		Object result = existingBean;
 		for (BeanPostProcessor processor : getBeanPostProcessors()) {
-			Object current = processor.postProcessAfterInitialization(result, beanName);
+			Object current = processor.postProcessAfterInitialization(result, beanName); // 真正创建代理对象
 			if (current == null) {
 				return result;
 			}
@@ -481,7 +481,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
-			// 提前给我们一个机会，去返回组件的代理对象 Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+			// （AOP没有使用这个机会）提前给我们一个机会，去返回组件的代理对象 Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
 				return bean;
@@ -562,7 +562,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
-			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
+			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean)); // 三级缓存中的Bean也会被后置处理来增强
 		}
 
 		// 属性赋值 Initialize the bean instance.

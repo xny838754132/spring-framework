@@ -16,17 +16,8 @@
 
 package org.springframework.context.event;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.aop.framework.autoproxy.AutoProxyUtils;
 import org.springframework.aop.scope.ScopedObject;
 import org.springframework.aop.scope.ScopedProxyUtils;
@@ -49,6 +40,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
+
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Registers {@link EventListener} methods as individual {@link ApplicationListener} instances.
@@ -109,7 +104,7 @@ public class EventListenerMethodProcessor
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
-
+		// 拿到所有的 EventListenerFactory 进行排序
 		Map<String, EventListenerFactory> beans = beanFactory.getBeansOfType(EventListenerFactory.class, false, false);
 		List<EventListenerFactory> factories = new ArrayList<>(beans.values());
 		AnnotationAwareOrderComparator.sort(factories);
@@ -197,7 +192,7 @@ public class EventListenerMethodProcessor
 						if (factory.supportsMethod(method)) {
 							Method methodToUse = AopUtils.selectInvocableMethod(method, context.getType(beanName));
 							ApplicationListener<?> applicationListener =
-									factory.createApplicationListener(beanName, targetType, methodToUse);
+									factory.createApplicationListener(beanName, targetType, methodToUse); // 创建监听器
 							if (applicationListener instanceof ApplicationListenerMethodAdapter) {
 								((ApplicationListenerMethodAdapter) applicationListener).init(context, this.evaluator);
 							}

@@ -374,10 +374,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// Decorate event as an ApplicationEvent if necessary
 		ApplicationEvent applicationEvent;
-		if (event instanceof ApplicationEvent) {
+		if (event instanceof ApplicationEvent) { // ApplicationEvent 下的事件
 			applicationEvent = (ApplicationEvent) event;
 		}
-		else {
+		else { // 支持任意对象作为事件 最终封装到 PayloadApplicationEvent 中
 			applicationEvent = new PayloadApplicationEvent<>(this, event, eventType);
 			if (eventType == null) {
 				eventType = ((PayloadApplicationEvent<?>) applicationEvent).getResolvableType();
@@ -388,7 +388,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		if (this.earlyApplicationEvents != null) {
 			this.earlyApplicationEvents.add(applicationEvent);
 		}
-		else {
+		else { // 拿到多播器发送事件即可
 			getApplicationEventMulticaster().multicastEvent(applicationEvent, eventType);
 		}
 
@@ -500,7 +500,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	public void addApplicationListener(ApplicationListener<?> listener) {
 		Assert.notNull(listener, "ApplicationListener must not be null");
 		if (this.applicationEventMulticaster != null) {
-			this.applicationEventMulticaster.addApplicationListener(listener);
+			this.applicationEventMulticaster.addApplicationListener(listener); // 注册到多播器中
 		}
 		this.applicationListeners.add(listener);
 	}
@@ -531,17 +531,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				postProcessBeanFactory(beanFactory);
 
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
-				// 工厂增强 ： 执行所有的 BeanFactory 后置增强器 ； 利用 BeanFactory 的后置增强器 对工厂进行修改或增强 Invoke factory processors registered as beans in the context.
+				// 【核心】工厂增强 ： 执行所有的 BeanFactory 后置增强器 ； 利用 BeanFactory 的后置增强器 对工厂进行修改或增强 Invoke factory processors registered as beans in the context.
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// 注册所有的 Bean 后置处理器 Register bean processors that intercept bean creation.
 				registerBeanPostProcessors(beanFactory);
 				beanPostProcess.end();
 
-				// Initialize message source for this context.
+				// 初始化国际化组件 Initialize message source for this context.
 				initMessageSource();
 
-				// Initialize event multicaster for this context.
+				// 初始化事件多播功能（事件派发） Initialize event multicaster for this context.
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
@@ -551,7 +551,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
-				// Bean创建： 完成 BeanFactory 初始化 (工厂中所有的组件都好了)
+				// 【核心】 Bean创建： 完成 BeanFactory 初始化 (工厂中所有的组件都好了)
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
@@ -827,12 +827,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// For subclasses: do nothing by default. 模版模式的实现
 	}
 
-	/**
+	/** 多播器和监听器是观察者模式（多播器里面包含了所有的监听器）
 	 * Add beans that implement ApplicationListener as listeners.
 	 * Doesn't affect other listeners, which can be added without being beans.
 	 */
 	protected void registerListeners() {
-		// Register statically specified listeners first.
+		// 把所有监听器都保存到多播器的集合中 Register statically specified listeners first.
 		for (ApplicationListener<?> listener : getApplicationListeners()) {
 			getApplicationEventMulticaster().addApplicationListener(listener);
 		}
@@ -844,7 +844,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			getApplicationEventMulticaster().addApplicationListenerBean(listenerBeanName); // 获取所有的容器中的监听器，并保存他们的名字
 		}
 
-		// Publish early application events now that we finally have a multicaster...
+		// 派发之前攒的一些早期事件 Publish early application events now that we finally have a multicaster...
 		Set<ApplicationEvent> earlyEventsToProcess = this.earlyApplicationEvents;
 		this.earlyApplicationEvents = null;
 		if (!CollectionUtils.isEmpty(earlyEventsToProcess)) {
@@ -897,16 +897,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	@SuppressWarnings("deprecation")
 	protected void finishRefresh() {
-		// Clear context-level resource caches (such as ASM metadata from scanning).
+		// 清理资源缓存 Clear context-level resource caches (such as ASM metadata from scanning).
 		clearResourceCaches();
 
 		// Initialize lifecycle processor for this context.
 		initLifecycleProcessor();
 
-		// Propagate refresh to lifecycle processor first.
+		// 告诉 LifecycleProcessor 容器已经 onRefresh Propagate refresh to lifecycle processor first.
 		getLifecycleProcessor().onRefresh();
 
-		// Publish the final event.
+		// 发布事件 Publish the final event.
 		publishEvent(new ContextRefreshedEvent(this));
 	}
 
